@@ -5,11 +5,13 @@ options:
     p: &c&l[!] &f
     NUM_MAX: 999999999
     MSG_DESTROYED_OTHER_HORCURX: &f누군가의 &e영혼조각을 &4파괴했습니다.
+    TITLE_DIED: &c사망했습니다
+    SUBTITLE_DIED: &75초후 남아있는 &e영혼조각이 &f있을시 &4부활합니다
 
 function deathEvent(p: player):
     set {_uuid} to uuid of {_p}
     set {_p}'s gamemode to spectator
-    send title "&c사망했습니다" with subtitle "&75초후 남아있는 &e영혼조각이 &f있을시 &4부활합니다" to {_p}
+    send title "{@TITLE_DIED}" with subtitle "{@SUBTITLE_DIED}" to {_p}
     wait 5 seconds
     set {_h} to hasHorcrux({_p})
     respawnEvent({_p},{_h})
@@ -17,22 +19,10 @@ function deathEvent(p: player):
 function respawnEvent(p: player,hasHorcrux: boolean):
     set {_dname} to {dname.%name of {_p}%}
     if {_hasHorcrux} is true:
-        teleport {_p} to getClosesthorcrux({_p})
+        teleport {_p} to getRespawnhorcrux({_p})
         set {_p}'s gamemode to survival
     else:
         broadcast "&e%{_dname}%&f님이 완전히 &c사망하셨습니다."
-
-function itemrightclickEvent(p: player, e: entity):
-    set {_euuid} to uuid of {_e}
-    if {edata.%{_euuid}%} is set:
-        stop
-    if {_e} is set:
-        if type of {_e} is not {_p}:
-            if distance between {_e} and {_p} < 4:
-                makeHorcrux({_p},{_e})
-                play sound "minecraft:block.sculk_shrieker.shriek" with volume 0.8 to {_p}
-                apply potion of darkness to {_p} for 5 seconds
-                remove 1 of {_p}'s tool from {_p}'s inventory
 
 function criticaldamageEvent(a: entity,v: entity,d: number):
     heal {_v} by 1000 hearts
@@ -44,4 +34,4 @@ function criticaldamageEvent(a: entity,v: entity,d: number):
 
 every 1 second:
     loop all players:
-        set loop-player's compass target to location of getClosesthorcrux(loop-player)
+        set loop-player's compass target to location of getClosesthorcrux(loop-player,loop-player)

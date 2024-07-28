@@ -11,10 +11,10 @@ on load:
     set {dname.unique_2ru} to "이루"
     set {dname._Aharks} to "상우"
     set {dname.GXUMXN} to "규민"
-    set {dnick.민재} to "K_1b" parsed as player
-    set {dnick.이루} to "unique_2ru" parsed as player
-    set {dnick.상우} to "_Aharks" parsed as player
-    set {dnick.규민} to "GXUMXN" parsed as player
+    set {dnick.민재} to "K_1b"
+    set {dnick.이루} to "unique_2ru"
+    set {dnick.상우} to "_Aharks"
+    set {dnick.규민} to "GXUMXN"
 
 
 on damage:
@@ -34,9 +34,22 @@ on death:
 on right click:
     if name of player's tool is "{@HORCRUX_ITEM_NAME}":
         set {_e} to player's target entity
-        itemrightclickEvent({_p},{_e})
+        set {_euuid} to uuid of {_e}
+        if {edata.%{_euuid}%} is set:
+            stop
+        if {_e} is set:
+            if type of {_e} is not player:
+                if distance between {_e} and player < 4:
+                    makeHorcrux(player,{_e})
+                    play sound "minecraft:block.sculk_shrieker.shriek" with volume 0.8 to player
+                    apply potion of darkness to player for 5 seconds
+                    remove 1 of player's tool from player's inventory
 
 on swap hand items:
     if player's tool is compass:
         cancel event
         openCompassGUI(player)
+
+command /makehorcrux:
+    trigger:
+        give 1 of nether star named "{@HORCRUX_ITEM_NAME}" to player

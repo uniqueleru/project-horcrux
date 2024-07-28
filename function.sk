@@ -10,18 +10,35 @@ options:
 function hasHorcrux(p: player) :: boolean:
     set {_uuid} to uuid of {_p}
     loop {hlist.%{_uuid}%::*}:
-        if loop-value is not alive:
+        if loop-value is not valid:
             remove loop-value from {hlist.%{_uuid}%::*}
     if size of {hlist.%{_uuid}%::*} > 0:
         return true
     else:
         return false
 
-function getClosesthorcrux(p: player) :: entity:
+function getClosesthorcrux(p: player,f: player) :: entity: #{_f} 의 위치 기준 가장 가까운 {_p}의 호크룩스 엔티티 리턴
     set {_uuid} to uuid of {_p}
     if size of {hlist.%{_uuid}%::*} > 0:
         set {_maxdist} to {@NUM_MAX}
-        set {_ret} to {_p} #만약 같은 월드의 호크룩스가 없으면 자기 자신을 리턴
+        set {_ret} to {_f} #만약 같은 월드의 호크룩스가 없으면 자기 자신을 리턴
+        loop {hlist.%{_uuid}%::*}:
+            if loop-value's world is {_f}'s world:
+                set {_dist} to distance between {_f} and loop-value
+            else:
+                set {_dist} to {@NUM_MAX}
+            if {_dist} < {_maxdist}:
+                set {_maxdist} to {_dist}
+                set {_ret} to loop-value
+        return {_ret}
+    else:
+        return {_f} #없으면 추적자 자신을 리턴
+
+function getRespawnhorcrux(p: player) :: entity:
+    set {_uuid} to uuid of {_p}
+    if size of {hlist.%{_uuid}%::*} > 0:
+        set {_maxdist} to {@NUM_MAX}
+        set {_ret} to random element of {hlist.%{_uuid}%::*} #같은 월드에 없으면 랜덤 호크룩스로 리스폰
         loop {hlist.%{_uuid}%::*}:
             if loop-value's world is {_p}'s world:
                 set {_dist} to distance between {_p} and loop-value
@@ -32,13 +49,14 @@ function getClosesthorcrux(p: player) :: entity:
                 set {_ret} to loop-value
         return {_ret}
     else:
-        return {_p} #없으면 플레이어 자기 자신을 리턴
+        return {_p} #없으면 플레이어 자기 자신을 리턴  
 
 function makeHorcrux(p: player,e: entity):
     set {_uuid} to uuid of {_p}
     set {_euuid} to uuid of {_e}
     add {_e} to {hlist.%{_uuid}%::*}
     set {edata.%{_euuid}%} to {_uuid}
+    execute console command "/data merge entity %{_euuid}% {PersistenceRequired:1b}"
     set {_e}'s display name to "{@HORCRUX_DISPLAY_NAME}"
 
 function removeHorcrux(e: entity):
@@ -60,7 +78,26 @@ function drawParticle(p1: location,p2: location):
         play flame at {_loc} to all players
         play soul fire flame at {_loc} to all players
 
+function getSortedtarget(p: player) :: texts:
+    set {_ret::*} to "이루" and "민재" and "상우" and "규민"
+    remove {dname.%name of {_p}%} from {_ret::*}
+    #해당 플레이어부터의 각 플레이어의 호크룩스까지의 거리 계산
+    loop {_ret::*}:
+        set {_lp} to {dnick.%loop-value%} parsed as player
+        set {_gch} to getClosesthorcrux({_lp},{_p})
+        if {_gch} is {_p}: #자기 자신이 리턴되었으면 해당 플레이어의 호크룩스 중 같은 월드에 있는것이 없다는 뜻 이므로 최대치 부여
+            set {_dist.%loop-value%} to {@NUM_MAX}
+        else:
+            set {_dist.%loop-value%} to distance between {_p} and {_gch}
+    sort {_ret::*} based on {_dist.%input%}
+    broadcast {_ret::*}
+    return {_ret::*}
+
 function openCompassGUI(p: player):
     set {_uuid} to uuid of {_p}
     open chest inventory with 3 row named "추적 설정" to {_p}
+    set {_tlist::*} to getSortedtarget({_p})
+    loop {_tlist::*}:
+        set {_lp} to {dnick.%loop-value%} parsed as player
+        set slot (9 + (loop-iteration) * 2) of current inventory of {_p} to {_lp}'s head named "&e%loop-value%" with lore "" and "&7&l> &f클릭하여 해당 플레이어를 추적합니다" and ""
 
