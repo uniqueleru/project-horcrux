@@ -22,22 +22,22 @@ function respawnEvent(p: player,hasHorcrux: boolean):
     else:
         broadcast "&e%{_dname}%&f님이 완전히 &c사망하셨습니다."
 
-function itemrightclickEvent(e: entity):
+function itemrightclickEvent(p: player, e: entity):
     set {_euuid} to uuid of {_e}
     if {edata.%{_euuid}%} is set:
         stop
     if {_e} is set:
-        if type of {_e} is not player:
-            if distance between {_e} and player < 4:
-                makeHorcrux(player,{_e})
-                play sound "minecraft:block.sculk_shrieker.shriek" with volume 0.8 to player
-                apply potion of darkness to player for 5 seconds
-                remove 1 of player's tool from player's inventory
+        if type of {_e} is not {_p}:
+            if distance between {_e} and {_p} < 4:
+                makeHorcrux({_p},{_e})
+                play sound "minecraft:block.sculk_shrieker.shriek" with volume 0.8 to {_p}
+                apply potion of darkness to {_p} for 5 seconds
+                remove 1 of {_p}'s tool from {_p}'s inventory
 
 function criticaldamageEvent(a: entity,v: entity,d: number):
     heal {_v} by 1000 hearts
     removeHorcrux({_v})
-    create an explosion of force 1 at the {_v}
+    create an explosion of force 1 at location of {_v}
     strike lightning at {_v}'s location
     send "{@p}{@MSG_DESTROYED_OTHER_HORCURX}" to {_a}
     kill {_v}

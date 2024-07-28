@@ -34,7 +34,7 @@ on death:
 on right click:
     if name of player's tool is "{@HORCRUX_ITEM_NAME}":
         set {_e} to player's target entity
-        itemrightclickEvent({_e})
+        itemrightclickEvent({_p},{_e})
 
 on swap hand items:
     if player's tool is compass:
