@@ -4,6 +4,7 @@
 options:
     p: &c&l[!] &f
     NUM_MAX: 999999999
+    HORCRUX_ITEM_NAME: &4영혼 서약
 
 on load:
     set {dname.K_1b} to "민재"
@@ -23,12 +24,7 @@ on damage:
         set {_euuid} to uuid of victim
         if {edata.%{_euuid}%} is set:
             cancel event
-            heal victim by 1000 hearts
-            removeHorcrux(victim)
-            create an explosion of force 1 at the victim
-            strike lightning at victim's location
-            send "{@p}&f누군가의 &e영혼조각을 &4파괴했습니다." to attacker
-            kill victim
+            criticaldamageEvent(attacker,victim,damage)
 
 on death:
     if victim is player:
@@ -36,18 +32,9 @@ on death:
         deathEvent(victim)
 
 on right click:
-    if name of player's tool is "&4영혼 서약":
+    if name of player's tool is "{@HORCRUX_ITEM_NAME}":
         set {_e} to player's target entity
-        set {_euuid} to uuid of {_e}
-        if {edata.%{_euuid}%} is set:
-            stop
-        if {_e} is set:
-            if type of {_e} is not player:
-                if distance between {_e} and player < 4:
-                    makeHorcrux(player,{_e})
-                    play sound "minecraft:block.sculk_shrieker.shriek" with volume 0.8 to player
-                    apply potion of darkness to player for 5 seconds
-                    remove 1 of player's tool from player's inventory
+        itemrightclickEvent({_e})
 
 on swap hand items:
     if player's tool is compass:

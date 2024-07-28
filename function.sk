@@ -4,6 +4,8 @@
 options:
     p: &c&l[!] &f
     NUM_MAX: 999999999
+    HORCRUX_DISPLAY_NAME: &4&oΣύμφωνο Ψυχής
+    MSG_HORCRUX_DESTROYED: &f당신의 &e영혼이 &f담겨진 생명체가 &4사망했습니다.
 
 function hasHorcrux(p: player) :: boolean:
     set {_uuid} to uuid of {_p}
@@ -37,19 +39,17 @@ function makeHorcrux(p: player,e: entity):
     set {_euuid} to uuid of {_e}
     add {_e} to {hlist.%{_uuid}%::*}
     set {edata.%{_euuid}%} to {_uuid}
-    set {_e}'s display name to "&4&oΣύμφωνο Ψυχής"
+    set {_e}'s display name to "{@HORCRUX_DISPLAY_NAME}"
 
 function removeHorcrux(e: entity):
     set {_euuid} to uuid of {_e}
     set {_uuid} to {edata.%{_euuid}%}
-    send "{@p}&f당신의 &e영혼이 &f담겨진 생명체가 &4사망했습니다." to {_uuid} parsed as player
+    send "{@p}{@MSG_HORCRUX_DESTROYED}" to {_uuid} parsed as player
     play sound "minecraft:entity.ender_dragon.growl" with volume 0.8 to {_uuid} parsed as player
     apply potion of darkness to {_uuid} parsed as player for 2 seconds
     remove {_e} from {hlist.%{_uuid}%::*}
     delete {edata.%{_euuid}%}
     set {_e}'s display name to ""
-
-
 
 function drawParticle(p1: location,p2: location):
     set {_v} to vector between {_p1} and {_p2}
@@ -63,3 +63,4 @@ function drawParticle(p1: location,p2: location):
 function openCompassGUI(p: player):
     set {_uuid} to uuid of {_p}
     open chest inventory with 3 row named "추적 설정" to {_p}
+
