@@ -18,13 +18,13 @@ function hasHorcrux(p: player) :: boolean:
 function getClosesthorcrux(p: player) :: entity:
     set {_uuid} to uuid of {_p}
     if size of {hlist.%{_uuid}%::*} > 0:
-        set {_maxdist} to @NUM_MAX
+        set {_maxdist} to {@NUM_MAX}
         set {_ret} to {_p} #만약 같은 월드의 호크룩스가 없으면 자기 자신을 리턴
         loop {hlist.%{_uuid}%::*}:
             if loop-value's world is {_p}'s world:
                 set {_dist} to distance between {_p} and loop-value
             else:
-                set {_dist} to @NUM_MAX
+                set {_dist} to {@NUM_MAX}
             if {_dist} < {_maxdist}:
                 set {_maxdist} to {_dist}
                 set {_ret} to loop-value
