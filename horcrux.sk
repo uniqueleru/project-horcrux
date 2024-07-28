@@ -1,0 +1,55 @@
+#script written by 이루 (youtube.com/@이루05)
+#project-horcrux (AKA. 영혼 레이스)
+
+options:
+    p: &c&l[!] &f
+    NUM_MAX: 999999999
+
+on load:
+    set {dname.K_1b} to "민재"
+    set {dname.unique_2ru} to "이루"
+    set {dname._Aharks} to "상우"
+    set {dname.GXUMXN} to "규민"
+    set {dnick.민재} to "K_1b" parsed as player
+    set {dnick.이루} to "unique_2ru" parsed as player
+    set {dnick.상우} to "_Aharks" parsed as player
+    set {dnick.규민} to "GXUMXN" parsed as player
+
+
+on damage:
+    if victim is player:
+        stop
+    if damage >= victim's health:
+        set {_euuid} to uuid of victim
+        if {edata.%{_euuid}%} is set:
+            cancel event
+            heal victim by 1000 hearts
+            removeHorcrux(victim)
+            create an explosion of force 1 at the victim
+            strike lightning at victim's location
+            send "{@p}&f누군가의 &e영혼조각을 &4파괴했습니다." to attacker
+            kill victim
+
+on death:
+    if victim is player:
+        force victim to respawn
+        deathEvent(victim)
+
+on right click:
+    if name of player's tool is "&4영혼 서약":
+        set {_e} to player's target entity
+        set {_euuid} to uuid of {_e}
+        if {edata.%{_euuid}%} is set:
+            stop
+        if {_e} is set:
+            if type of {_e} is not player:
+                if distance between {_e} and player < 4:
+                    makeHorcrux(player,{_e})
+                    play sound "minecraft:block.sculk_shrieker.shriek" with volume 0.8 to player
+                    apply potion of darkness to player for 5 seconds
+                    remove 1 of player's tool from player's inventory
+
+on swap hand items:
+    if player's tool is compass:
+        cancel event
+        openCompassGUI(player)

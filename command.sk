@@ -1,0 +1,17 @@
+#script written by 이루 (youtube.com/@이루05)
+#project-horcrux (AKA. 영혼 레이스)
+
+options:
+    p: &c&l[!] &f
+    NUM_MAX: 999999999
+
+command /makehorcrux:
+    trigger:
+        give 1 of nether star named "&4영혼 서약" to player
+
+command /t1:
+    trigger:
+        set {_p1} to location of player
+        add 1 to y-coordinate of {_p1}
+        set {_p2} to location of getClosesthorcrux(player)
+        drawParticle({_p1},{_p2})

@@ -1,0 +1,26 @@
+#script written by 이루 (youtube.com/@이루05)
+#project-horcrux (AKA. 영혼 레이스)
+
+options:
+    p: &c&l[!] &f
+    NUM_MAX: 999999999
+
+function deathEvent(p: player):
+    set {_uuid} to uuid of {_p}
+    set {_p}'s gamemode to spectator
+    send title "&c사망했습니다" with subtitle "&75초후 남아있는 &e영혼조각이 &f있을시 &4부활합니다" to {_p}
+    wait 5 seconds
+    set {_h} to hasHorcrux({_p})
+    respawnEvent({_p},{_h})
+
+function respawnEvent(p: player,hasHorcrux: boolean):
+    set {_dname} to {dname.%name of {_p}%}
+    if {_hasHorcrux} is true:
+        teleport {_p} to getClosesthorcrux({_p})
+        set {_p}'s gamemode to survival
+    else:
+        broadcast "&e%{_dname}%&f님이 완전히 &c사망하셨습니다."
+
+every 1 second:
+    loop all players:
+        set loop-player's compass target to location of getClosesthorcrux(loop-player)

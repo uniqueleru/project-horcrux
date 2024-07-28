@@ -1,0 +1,65 @@
+#script written by 이루 (youtube.com/@이루05)
+#project-horcrux (AKA. 영혼 레이스)
+
+options:
+    p: &c&l[!] &f
+    NUM_MAX: 999999999
+
+function hasHorcrux(p: player) :: boolean:
+    set {_uuid} to uuid of {_p}
+    loop {hlist.%{_uuid}%::*}:
+        if loop-value is not alive:
+            remove loop-value from {hlist.%{_uuid}%::*}
+    if size of {hlist.%{_uuid}%::*} > 0:
+        return true
+    else:
+        return false
+
+function getClosesthorcrux(p: player) :: entity:
+    set {_uuid} to uuid of {_p}
+    if size of {hlist.%{_uuid}%::*} > 0:
+        set {_maxdist} to @NUM_MAX
+        set {_ret} to {_p} #만약 같은 월드의 호크룩스가 없으면 자기 자신을 리턴
+        loop {hlist.%{_uuid}%::*}:
+            if loop-value's world is {_p}'s world:
+                set {_dist} to distance between {_p} and loop-value
+            else:
+                set {_dist} to @NUM_MAX
+            if {_dist} < {_maxdist}:
+                set {_maxdist} to {_dist}
+                set {_ret} to loop-value
+        return {_ret}
+    else:
+        return {_p} #없으면 플레이어 자기 자신을 리턴
+
+function makeHorcrux(p: player,e: entity):
+    set {_uuid} to uuid of {_p}
+    set {_euuid} to uuid of {_e}
+    add {_e} to {hlist.%{_uuid}%::*}
+    set {edata.%{_euuid}%} to {_uuid}
+    set {_e}'s display name to "&4&oΣύμφωνο Ψυχής"
+
+function removeHorcrux(e: entity):
+    set {_euuid} to uuid of {_e}
+    set {_uuid} to {edata.%{_euuid}%}
+    send "{@p}&f당신의 &e영혼이 &f담겨진 생명체가 &4사망했습니다." to {_uuid} parsed as player
+    play sound "minecraft:entity.ender_dragon.growl" with volume 0.8 to {_uuid} parsed as player
+    apply potion of darkness to {_uuid} parsed as player for 2 seconds
+    remove {_e} from {hlist.%{_uuid}%::*}
+    delete {edata.%{_euuid}%}
+    set {_e}'s display name to ""
+
+
+
+function drawParticle(p1: location,p2: location):
+    set {_v} to vector between {_p1} and {_p2}
+    set standard length of {_v} to 0.1
+    set {_loc} to {_p1}
+    loop 50 times:
+        set {_loc} to {_loc} ~ {_v}
+        play flame at {_loc} to all players
+        play soul fire flame at {_loc} to all players
+
+function openCompassGUI(p: player):
+    set {_uuid} to uuid of {_p}
+    open chest inventory with 3 row named "추적 설정" to {_p}
