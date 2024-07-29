@@ -70,14 +70,16 @@ function removeHorcrux(e: entity):
     delete {edata.%{_euuid}%}
     set {_e}'s display name to ""
 
-function drawParticle(p1: location,p2: location):
+function drawParticle(p1: location,p2: location,type: text):
     set {_v} to vector between {_p1} and {_p2}
     set standard length of {_v} to 0.1
     set {_loc} to {_p1}
     loop 50 times:
         set {_loc} to {_loc} ~ {_v}
-        play flame at {_loc} to all players
-        play soul fire flame at {_loc} to all players
+        if {_type} is "soul_fire_flame":
+            play soul fire flame at {_loc} to all players
+        else if {_type} is "fire_flame":
+            play flame at {_loc} to all players
 
 function getSortedtarget(p: player) :: texts:
     set {_ret::*} to "이루" and "민재" and "상우" and "규민"
@@ -105,9 +107,14 @@ function trackSoul(p: player,t: player):
     set {_tuuid} to uuid of {_t}
     if {_p}'s world is {_t}'s world:
         add {_t} to {_tracklist::*}
+    set {_min} to {@NUM_MAX}
     loop {hlist.%{_tuuid}%::*}:
         if loop-value's world is {_p}'s world:
             add loop-value to {_tracklist::*}
+            set {_dist} to distance between location of {_p} and location of loop-value
+            if {_dist} < {_min}:
+                set {_min} to {_dist}
+                set {_ctarget} to loop-value
     set {_ploc} to location of {_p}
     add 1 to y-coordinate of {_ploc}
     if {_tracklist::*} is not set:
@@ -119,6 +126,10 @@ function trackSoul(p: player,t: player):
             wait 2 ticks
     else:
         loop {_tracklist::*}:
-            drawParticle({_ploc},location of loop-value)
+            if loop-value is {_ctarget}:
+                drawParticle({_ploc},location of loop-value,"soul_fire_flame")
+            else:
+                drawParticle({_ploc},location of loop-value,"fire_flame")
+
     
     

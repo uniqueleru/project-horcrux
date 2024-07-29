@@ -17,6 +17,10 @@ on load:
     set {dnick.상우} to "_Aharks"
     set {dnick.규민} to "GXUMXN"
 
+on join:
+    if {dname.%name of player%} is set:
+        set player's display name to {dname.%name of player%}
+        set player's tablist name to {dname.%name of player%}
 
 on damage:
     if victim is player:
