@@ -5,6 +5,7 @@ options:
     p: &c&l[!] &f
     NUM_MAX: 999999999
     HORCRUX_ITEM_NAME: &4영혼 서약
+    MSG_TARGET_NOT_DEFINED: &e추적 대상이 &f지정되지 않았습니다
 
 on load:
     set {dname.K_1b} to "민재"
@@ -44,6 +45,13 @@ on right click:
                     play sound "minecraft:block.sculk_shrieker.shriek" with volume 0.8 to player
                     apply potion of darkness to player for 5 seconds
                     remove 1 of player's tool from player's inventory
+
+on right click with diamond:
+    if {htarget.%uuid of player%} is not set:
+        send "{@p}{@MSG_TARGET_NOT_DEFINED}" to player
+    else:
+        remove 1 of player's tool from player's inventory
+        trackSoul(player,{htarget.%uuid of player%})
 
 on swap hand items:
     if player's tool is compass:

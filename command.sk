@@ -5,9 +5,7 @@ options:
     p: &c&l[!] &f
     NUM_MAX: 999999999
 
-command /t1:
+command /추적 [<player>]:
     trigger:
-        set {_p1} to location of player
-        add 1 to y-coordinate of {_p1}
-        set {_p2} to location of getClosesthorcrux(player,player)
-        drawParticle({_p1},{_p2})
+        set {htarget.%uuid of player%} to arg 1
+        send "{@p} &e%{dname.%name of arg 1%}%님을 &c추적 타겟으로 &f지정했습니다"

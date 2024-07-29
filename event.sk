@@ -6,13 +6,13 @@ options:
     NUM_MAX: 999999999
     MSG_DESTROYED_OTHER_HORCURX: &f누군가의 &e영혼조각을 &4파괴했습니다.
     TITLE_DIED: &c사망했습니다
-    SUBTITLE_DIED: &75초후 남아있는 &e영혼조각이 &f있을시 &4부활합니다
+    SUBTITLE_DIED: &730초후 남아있는 &e영혼조각이 &f있을시 &4부활합니다
 
 function deathEvent(p: player):
     set {_uuid} to uuid of {_p}
     set {_p}'s gamemode to spectator
     send title "{@TITLE_DIED}" with subtitle "{@SUBTITLE_DIED}" to {_p}
-    wait 5 seconds
+    wait 30 seconds
     set {_h} to hasHorcrux({_p})
     respawnEvent({_p},{_h})
 
@@ -21,6 +21,7 @@ function respawnEvent(p: player,hasHorcrux: boolean):
     if {_hasHorcrux} is true:
         teleport {_p} to getRespawnhorcrux({_p})
         set {_p}'s gamemode to survival
+        give 1 of compass to {_p}
     else:
         broadcast "&e%{_dname}%&f님이 완전히 &c사망하셨습니다."
 
@@ -35,3 +36,14 @@ function criticaldamageEvent(a: entity,v: entity,d: number):
 every 1 second:
     loop all players:
         set loop-player's compass target to location of getClosesthorcrux(loop-player,loop-player)
+
+on inventory click:
+    if name of current inventory of player is "추적 설정":
+        cancel event
+        if clicked slot is 11 or 13 or 15:
+            set {_name} to uncolored name of event-item
+            set {_target} to {dnick.%{_name}%}
+            make player execute command "/추적 %{_target}%"
+
+on death:
+    set death message to ""

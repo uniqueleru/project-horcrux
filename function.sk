@@ -9,9 +9,10 @@ options:
 
 function hasHorcrux(p: player) :: boolean:
     set {_uuid} to uuid of {_p}
-    loop {hlist.%{_uuid}%::*}:
-        if loop-value is not valid:
-            remove loop-value from {hlist.%{_uuid}%::*}
+    #loop {hlist.%{_uuid}%::*}:
+        #spawn 1 of bat at location of loop-value
+        #if loop-value is not valid:
+            #remove loop-value from {hlist.%{_uuid}%::*}
     if size of {hlist.%{_uuid}%::*} > 0:
         return true
     else:
@@ -90,7 +91,6 @@ function getSortedtarget(p: player) :: texts:
         else:
             set {_dist.%loop-value%} to distance between {_p} and {_gch}
     sort {_ret::*} based on {_dist.%input%}
-    broadcast {_ret::*}
     return {_ret::*}
 
 function openCompassGUI(p: player):
@@ -101,3 +101,24 @@ function openCompassGUI(p: player):
         set {_lp} to {dnick.%loop-value%} parsed as player
         set slot (9 + (loop-iteration) * 2) of current inventory of {_p} to {_lp}'s head named "&e%loop-value%" with lore "" and "&7&l> &f클릭하여 해당 플레이어를 추적합니다" and ""
 
+function trackSoul(p: player,t: player):
+    set {_tuuid} to uuid of {_t}
+    if {_p}'s world is {_t}'s world:
+        add {_t} to {_tracklist::*}
+    loop {hlist.%{_tuuid}%::*}:
+        if loop-value's world is {_p}'s world:
+            add loop-value to {_tracklist::*}
+    set {_ploc} to location of {_p}
+    add 1 to y-coordinate of {_ploc}
+    if {_tracklist::*} is not set:
+        set {_ploc} to location 1 block in front of {_p}
+        add 1 to y-coordinate of {_ploc}
+        play sound "minecraft:entity.villager.no" with volume 0.8 to {_p}
+        loop 10 times:
+            play angry villager at {_ploc} to all players
+            wait 2 ticks
+    else:
+        loop {_tracklist::*}:
+            drawParticle({_ploc},location of loop-value)
+    
+    
